@@ -1,0 +1,42 @@
+name: Build patched tv-recyclerview aar
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-aar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-34"
+
+      - name: Make script executable
+        run: chmod +x scripts/build_patched_aar.sh
+
+      - name: Build patched aar
+        env:
+          ANDROID_PLATFORM: 34
+        run: ./scripts/build_patched_aar.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: patched-aar
+          path: dist/tv-recyclerview-3.0.0-patched.aar
