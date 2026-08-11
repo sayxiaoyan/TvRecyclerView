@@ -156,22 +156,26 @@ javac \
   generated/com/owen/tvrecyclerview/R.java \
   "$PATCHED_JAVA"
 
-PATCH_CLASS_FILE="$WORK_DIR/patched-classes/com/owen/tvrecyclerview/widget/TvRecyclerView.class"
-if [ ! -f "$PATCH_CLASS_FILE" ]; then
-  echo "Patched TvRecyclerView.class not found" >&2
+PATCH_CLASS_DIR="$WORK_DIR/patched-classes/com/owen/tvrecyclerview/widget"
+if [ ! -d "$PATCH_CLASS_DIR" ]; then
+  echo "Patched TvRecyclerView classes directory not found" >&2
+  exit 1
+fi
+if ! find "$PATCH_CLASS_DIR" -maxdepth 1 -type f -name 'TvRecyclerView*.class' | grep -q .; then
+  echo "No patched TvRecyclerView classes generated" >&2
   exit 1
 fi
 
 mkdir -p jar-update/com/owen/tvrecyclerview/widget
-cp "$PATCH_CLASS_FILE" jar-update/com/owen/tvrecyclerview/widget/
+find "$PATCH_CLASS_DIR" -maxdepth 1 -type f -name 'TvRecyclerView*.class' -exec cp {} jar-update/com/owen/tvrecyclerview/widget/ \;
 
 cp "$ORIGINAL_AAR" "$PATCHED_AAR"
 mkdir final-aar
 cd final-aar
 unzip -q "$PATCHED_AAR"
-zip -qd classes.jar 'com/owen/tvrecyclerview/widget/TvRecyclerView.class' >/dev/null 2>&1 || true
+zip -qd classes.jar 'com/owen/tvrecyclerview/widget/TvRecyclerView*.class' >/dev/null 2>&1 || true
 cd "$WORK_DIR/jar-update"
-zip -qur "$WORK_DIR/final-aar/classes.jar" com/owen/tvrecyclerview/widget/TvRecyclerView.class
+zip -qur "$WORK_DIR/final-aar/classes.jar" com/owen/tvrecyclerview/widget
 cd "$WORK_DIR/final-aar"
 zip -qr "$PATCHED_AAR" .
 cd "$ROOT_DIR"
