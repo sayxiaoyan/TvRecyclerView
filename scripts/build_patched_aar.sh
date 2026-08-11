@@ -104,8 +104,9 @@ cp "$ROOT_DIR/original/recyclerview-1.3.2.aar" deps/recyclerview.aar
 cp "$ROOT_DIR/original/legacy-support-v4-1.0.0.aar" deps/legacy-support-v4.aar
 cp "$ROOT_DIR/original/vlayout-1.2.37.aar" deps/vlayout.aar
 cp "$ROOT_DIR/original/core-1.13.0.aar" deps/core.aar
+cp "$ROOT_DIR/original/customview-1.1.0.aar" deps/customview.aar
 
-for dep in recyclerview legacy-support-v4 vlayout core; do
+for dep in recyclerview legacy-support-v4 vlayout core customview; do
   mkdir -p "extracted/$dep"
   unzip -q "deps/$dep.aar" -d "extracted/$dep"
   cp "extracted/$dep/classes.jar" "deps/$dep.jar"
@@ -116,12 +117,22 @@ package com.owen.tvrecyclerview;
 
 public final class R {
     public static final class styleable {
-        public static final int[] TvRecyclerView = new int[5];
-        public static final int TvRecyclerView_tv_layoutManager = 0;
-        public static final int TvRecyclerView_selectedItemisCentered = 1;
-        public static final int TvRecyclerView_selectedItemOffsetStart = 2;
-        public static final int TvRecyclerView_selectedItemOffsetEnd = 3;
-        public static final int TvRecyclerView_android_orientation = 4;
+        public static final int[] TvRecyclerView = new int[14];
+        public static final int TvRecyclerView_android_orientation = 0;
+        public static final int TvRecyclerView_tv_layoutManager = 1;
+        public static final int TvRecyclerView_tv_selectedItemOffsetStart = 2;
+        public static final int TvRecyclerView_tv_selectedItemOffsetEnd = 3;
+        public static final int TvRecyclerView_tv_selectedItemIsCentered = 4;
+        public static final int TvRecyclerView_tv_isMenu = 5;
+        public static final int TvRecyclerView_tv_isMemoryFocus = 6;
+        public static final int TvRecyclerView_tv_loadMoreBeforehandCount = 7;
+        public static final int TvRecyclerView_tv_optimizeLayout = 8;
+        public static final int TvRecyclerView_tv_verticalSpacingWithMargins = 9;
+        public static final int TvRecyclerView_tv_horizontalSpacingWithMargins = 10;
+        public static final int TvRecyclerView_tv_numColumns = 11;
+        public static final int TvRecyclerView_tv_numRows = 12;
+        public static final int TvRecyclerView_tv_laneCountsStr = 13;
+        public static final int TvRecyclerView_tv_isIntelligentScroll = 14;
     }
 }
 EOF
@@ -130,7 +141,7 @@ mkdir -p patched-classes
 javac \
   -encoding UTF-8 \
   -source 8 -target 8 \
-  -cp "$ANDROID_JAR:$WORK_DIR/aar/classes.jar:$WORK_DIR/deps/recyclerview.jar:$WORK_DIR/deps/legacy-support-v4.jar:$WORK_DIR/deps/vlayout.jar:$WORK_DIR/deps/core.jar" \
+  -cp "$ANDROID_JAR:$WORK_DIR/aar/classes.jar:$WORK_DIR/deps/recyclerview.jar:$WORK_DIR/deps/legacy-support-v4.jar:$WORK_DIR/deps/vlayout.jar:$WORK_DIR/deps/core.jar:$WORK_DIR/deps/customview.jar" \
   -d patched-classes \
   generated/com/owen/tvrecyclerview/R.java \
   "$PATCHED_JAVA"
