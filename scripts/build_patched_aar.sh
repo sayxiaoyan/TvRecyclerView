@@ -43,7 +43,6 @@ fi
 PATCHED_JAVA="$PATCHED_JAVA" python3 - <<'PY'
 from pathlib import Path
 import os
-import re
 
 path = Path(os.environ['PATCHED_JAVA'])
 text = path.read_text(encoding='utf-8')
@@ -100,16 +99,10 @@ if [ ! -f "$ANDROID_JAR" ]; then
   exit 1
 fi
 
-fetch_dep() {
-  local url="$1"
-  local out="$2"
-  curl -L --fail -o "$out" "$url"
-}
-
 mkdir -p deps extracted
-fetch_dep https://repo1.maven.org/maven2/androidx/recyclerview/recyclerview/1.1.0/recyclerview-1.1.0.aar deps/recyclerview.aar
-fetch_dep https://repo1.maven.org/maven2/androidx/legacy/legacy-support-v4/1.0.0/legacy-support-v4-1.0.0.aar deps/legacy-support-v4.aar
-fetch_dep https://repo1.maven.org/maven2/com/alibaba/android/vlayout/1.2.37/vlayout-1.2.37.aar deps/vlayout.aar
+cp "$ROOT_DIR/original/recyclerview-1.3.2.aar" deps/recyclerview.aar
+cp "$ROOT_DIR/original/legacy-support-v4-1.0.0.aar" deps/legacy-support-v4.aar
+cp "$ROOT_DIR/original/vlayout-1.2.37.aar" deps/vlayout.aar
 
 for dep in recyclerview legacy-support-v4 vlayout; do
   mkdir -p "extracted/$dep"
