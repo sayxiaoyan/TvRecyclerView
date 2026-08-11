@@ -1,77 +1,42 @@
-# 欢迎使用 TvRecyclerView
+# tv-recyclerview patch repo
 
-首先感谢lucasr开发出杰出的作品[TwoWayView](https://github.com/lucasr/twoway-view),**TvRecyclerView**就是在[TwoWayView](https://github.com/lucasr/twoway-view)的基础上进行的延伸，即：
+这个目录是给 `com.owen:tv-recyclerview:3.0.0` 做补丁 AAR 用的。
 
-> * 修复了一些小bug
-> * 针对TV端的特性进行了适配与开发
+## 已放入的内容
 
-### 效果
+- `original/tv-recyclerview-3.0.0-original.aar`
+  原始 AAR
+- `scripts/build_patched_aar.sh`
+  GitHub Actions / 本地共用的构建脚本
+- `.github/workflows/build-aar.yml`
+  GitHub Actions 工作流
 
-![](https://github.com/zhousuqiang/TvRecyclerView/blob/master/images/img_spannable.png)
+## 目标
 
-![](https://github.com/zhousuqiang/TvRecyclerView/blob/master/images/img_staggered.png)
+自动完成下面的事情：
 
-![](https://github.com/zhousuqiang/TvRecyclerView/blob/master/images/img_grid.png)
+1. 解包原始 AAR
+2. 解包 `classes.jar`
+3. 反编译 `TvRecyclerView.class`
+4. 给 `getLastVisibleAndFocusablePosition()` 补 `LayoutManager == null` 判空
+5. 重新编译 `TvRecyclerView.java`
+6. 替换 `classes.jar` 里的 `TvRecyclerView*.class`
+7. 重打出新的 AAR
 
-![](https://github.com/zhousuqiang/TvRecyclerView/blob/master/images/img_list.png)
+输出目录：`dist/`
 
-### Android Studio 集成
+输出文件名：`tv-recyclerview-3.0.0-patched.aar`
 
-```java
-compile 'com.tv.boost:tv-recyclerview:1.0.1'
-```
+## 直接用 GitHub 打包
 
-### 特性
+把整个 `TvRecyclerView` 目录上传到 GitHub 仓库后：
 
-- [x] 支持焦点快速移动
+1. 打开仓库的 `Actions`
+2. 运行 `Build patched tv-recyclerview aar`
+3. 在 Actions Artifacts 里下载 `patched-aar`
 
-- [x] 支持Item选中放大时不被叠压(无需手动调用bringChildToFront())
+## 说明
 
-- [x] 支持横/竖排列
-    ```java
-    android:orientation="horizontal"
-    ```
+这个仓库走的是“定点补丁”路线，不需要你先找到原始源码仓库。
 
-- [x] 支持布局指定LayoutManager
-    ```java
-    app:tv_layoutManager="SpannableGridLayoutManager"
-    ```
-
-- [x] 支持设置选中Item边缘距离/居中
-    ```java
-    setSelectedItemAtCentered(boolean isCentered)
-    setSelectedItemOffset(int offsetStart, int offsetEnd)
-    ```
-
-- [x] 支持设置横竖间距
-    ```java
-    setSpacingWithMargins(int verticalSpacing, int horizontalSpacing)
-    ```
-
-- [x] Item监听回调
-    ```java
-    mRecyclerView.setOnItemListener(new TvRecyclerView.OnItemListener() {
-        @Override
-        public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
-                
-        }
-
-        @Override
-        public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-                
-        }
-
-        @Override
-        public void onItemClick(TvRecyclerView parent, View itemView, int position) {
-                
-        }
-    });
-    ```
-
-
-### 更详细的使用请见exmaple
-
-------
-
-
-作者 [owen](https://github.com/zhousuqiang)
+如果后面你想长期维护这个库，建议再演进成完整的 Android library module。
