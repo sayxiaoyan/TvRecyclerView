@@ -99,23 +99,40 @@ if [ ! -f "$ANDROID_JAR" ]; then
   exit 1
 fi
 
-mkdir -p deps extracted
+mkdir -p deps extracted generated/com/owen/tvrecyclerview
 cp "$ROOT_DIR/original/recyclerview-1.3.2.aar" deps/recyclerview.aar
 cp "$ROOT_DIR/original/legacy-support-v4-1.0.0.aar" deps/legacy-support-v4.aar
 cp "$ROOT_DIR/original/vlayout-1.2.37.aar" deps/vlayout.aar
+cp "$ROOT_DIR/original/core-1.13.0.aar" deps/core.aar
 
-for dep in recyclerview legacy-support-v4 vlayout; do
+for dep in recyclerview legacy-support-v4 vlayout core; do
   mkdir -p "extracted/$dep"
   unzip -q "deps/$dep.aar" -d "extracted/$dep"
   cp "extracted/$dep/classes.jar" "deps/$dep.jar"
 done
 
+cat > generated/com/owen/tvrecyclerview/R.java <<'EOF'
+package com.owen.tvrecyclerview;
+
+public final class R {
+    public static final class styleable {
+        public static final int[] TvRecyclerView = new int[5];
+        public static final int TvRecyclerView_tv_layoutManager = 0;
+        public static final int TvRecyclerView_selectedItemisCentered = 1;
+        public static final int TvRecyclerView_selectedItemOffsetStart = 2;
+        public static final int TvRecyclerView_selectedItemOffsetEnd = 3;
+        public static final int TvRecyclerView_android_orientation = 4;
+    }
+}
+EOF
+
 mkdir -p patched-classes
 javac \
   -encoding UTF-8 \
   -source 8 -target 8 \
-  -cp "$ANDROID_JAR:$WORK_DIR/aar/classes.jar:$WORK_DIR/deps/recyclerview.jar:$WORK_DIR/deps/legacy-support-v4.jar:$WORK_DIR/deps/vlayout.jar" \
+  -cp "$ANDROID_JAR:$WORK_DIR/aar/classes.jar:$WORK_DIR/deps/recyclerview.jar:$WORK_DIR/deps/legacy-support-v4.jar:$WORK_DIR/deps/vlayout.jar:$WORK_DIR/deps/core.jar" \
   -d patched-classes \
+  generated/com/owen/tvrecyclerview/R.java \
   "$PATCHED_JAVA"
 
 cd patched-classes
