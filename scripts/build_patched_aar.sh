@@ -52,6 +52,10 @@ text = text.replace(
     'Class<RecyclerView.LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(RecyclerView.LayoutManager.class);',
     'Class<? extends RecyclerView.LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(RecyclerView.LayoutManager.class);'
 )
+text = text.replace(
+    'Constructor<RecyclerView.LayoutManager> constructor;',
+    'Constructor<? extends RecyclerView.LayoutManager> constructor;'
+)
 
 needle = "public int getLastVisibleAndFocusablePosition()"
 start = text.find(needle)
