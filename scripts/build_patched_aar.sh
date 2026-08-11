@@ -47,7 +47,6 @@ import os
 path = Path(os.environ['PATCHED_JAVA'])
 text = path.read_text(encoding='utf-8')
 
-# Fix CFR generic inference that does not compile under javac.
 text = text.replace(
     'Class<RecyclerView.LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(RecyclerView.LayoutManager.class);',
     'Class<? extends RecyclerView.LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(RecyclerView.LayoutManager.class);'
@@ -128,7 +127,7 @@ package com.owen.tvrecyclerview;
 
 public final class R {
     public static final class styleable {
-        public static final int[] TvRecyclerView = new int[14];
+        public static final int[] TvRecyclerView = new int[15];
         public static final int TvRecyclerView_android_orientation = 0;
         public static final int TvRecyclerView_tv_layoutManager = 1;
         public static final int TvRecyclerView_tv_selectedItemOffsetStart = 2;
@@ -157,23 +156,27 @@ javac \
   generated/com/owen/tvrecyclerview/R.java \
   "$PATCHED_JAVA"
 
-cd patched-classes
-PATCH_CLASSES=$(find com/owen/tvrecyclerview/widget -maxdepth 1 -type f -name 'TvRecyclerView*.class' | sort)
-if [ -z "$PATCH_CLASSES" ]; then
+PATCH_CLASS_DIR="$WORK_DIR/patched-classes/com/owen/tvrecyclerview/widget"
+if [ ! -d "$PATCH_CLASS_DIR" ]; then
+  echo "Patched TvRecyclerView classes directory not found" >&2
+  exit 1
+fi
+if ! find "$PATCH_CLASS_DIR" -maxdepth 1 -type f -name 'TvRecyclerView*.class' | grep -q .; then
   echo "No patched TvRecyclerView classes generated" >&2
   exit 1
 fi
-cd "$WORK_DIR"
 
-mkdir replace-jar
-cd replace-jar
-jar xf ../aar/classes.jar
-find com/owen/tvrecyclerview/widget -maxdepth 1 -type f -name 'TvRecyclerView*.class' -delete
-cp -R ../patched-classes/com ./
-jar cf ../aar/classes.jar .
-cd "$WORK_DIR"
+mkdir -p jar-update/com/owen/tvrecyclerview/widget
+find "$PATCH_CLASS_DIR" -maxdepth 1 -type f -name 'TvRecyclerView*.class' -exec cp {} jar-update/com/owen/tvrecyclerview/widget/ \;
 
-cd aar
+cp "$ORIGINAL_AAR" "$PATCHED_AAR"
+mkdir final-aar
+cd final-aar
+unzip -q "$PATCHED_AAR"
+zip -qd classes.jar 'com/owen/tvrecyclerview/widget/TvRecyclerView*.class' >/dev/null 2>&1 || true
+cd "$WORK_DIR/jar-update"
+zip -qur "$WORK_DIR/final-aar/classes.jar" com/owen/tvrecyclerview/widget
+cd "$WORK_DIR/final-aar"
 zip -qr "$PATCHED_AAR" .
 cd "$ROOT_DIR"
 
