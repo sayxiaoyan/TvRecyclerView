@@ -46,6 +46,13 @@ import os
 
 path = Path(os.environ['PATCHED_JAVA'])
 text = path.read_text(encoding='utf-8')
+
+# Fix CFR generic inference that does not compile under javac.
+text = text.replace(
+    'Class<RecyclerView.LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(RecyclerView.LayoutManager.class);',
+    'Class<? extends RecyclerView.LayoutManager> layoutManagerClass = classLoader.loadClass(className).asSubclass(RecyclerView.LayoutManager.class);'
+)
+
 needle = "public int getLastVisibleAndFocusablePosition()"
 start = text.find(needle)
 if start == -1:
