@@ -2,8 +2,6 @@ name: Build patched tv-recyclerview aar
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main, master ]
 
 jobs:
   build-aar:
